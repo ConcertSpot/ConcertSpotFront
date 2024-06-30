@@ -8,7 +8,7 @@ const Container = styled.div`
   background-color: black;
 
   @media (max-width: 768px) {
-    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     background-color: lightgray;
@@ -21,7 +21,7 @@ const TopFrame = styled.div`
   border: 1px solid black;
 
   @media (max-width: 768px) {
-    height: 90vh;
+    height: 90dvh;
     border: none;
     display: flex;
     align-items: center;
