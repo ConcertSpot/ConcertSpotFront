@@ -17,7 +17,7 @@ const Container = styled.div`
 
 const TopFrame = styled.div`
   width: 100%;
-  height: 75vh;
+  height: 90vh;
   border: 1px solid black;
 
   @media (max-width: 768px) {
@@ -72,7 +72,7 @@ const Map = () => {
   return (
     <Container>
       <TopFrame>
-        <div id="map" style={{ width: "100%", height: "90dvh", zIndex: 100 }}></div>
+        <div id="map" style={{ width: "100%", height: "100%", zIndex: 100 }}></div>
       </TopFrame>
       <Footer />
     </Container>
