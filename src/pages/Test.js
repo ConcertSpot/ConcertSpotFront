@@ -5,7 +5,7 @@ const KakaoMap = () => {
     const existingScript = document.getElementById('kakao-map-script');
     if (!existingScript) {
       const script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=API키 입력&autoload=false`;
+      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=ed218e43e083f32fc9b2e645cbee237d&autoload=false`;
       script.async = true;
       script.id = 'kakao-map-script';
       document.head.appendChild(script);
