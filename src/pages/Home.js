@@ -1,65 +1,123 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+import axios from "axios";
 import Footer from "../components/Footer";
 import Modal from "../components/Modal";
+import RowConcertBox from "../components/RowConcertBox";
+
+// 애니메이션 효과 영역
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const textUp = keyframes`
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-35dvh);
+  }
+`;
+
+// styled-component 영역
 
 const Container = styled.div`
   width: 100%;
-  height: 100vh;
-  background-color: black;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: gray;
 
   @media (max-width: 768px) {
+    width: 100%;
     height: 100dvh;
     display: flex;
     flex-direction: column;
-    background-color: lightgray;
+    background-color: white;
   }
 `;
 
 const TopFrame = styled.div`
-  width: 100%;
-  height: 75dvh;
-  border: 1px solid black;
+  @media (min-width: 1920px) {
+    width: 100%;
+    height: 75%;
+    position: relative;
+    overflow-y: scroll;
+  }
 
   @media (max-width: 768px) {
+    width: 100%;
     height: 90dvh;
-    border: none;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
+    overflow-x: hidden;
 
     h1 {
-      color: white;
+      text-align: center;
+      position: absolute;
+      color: black;
       padding: 20px;
+      bottom: 50%;
+      animation: ${fadeIn} 2s ease-in-out, ${textUp} 1.5s 0.5s ease-in-out forwards;
     }
   }
 `;
 
-const Home = () => {
+// 본문
 
-  const [modalState, setModalState] = useState(false);
-  
+const Home = () => {
+  const [concertList, setConcertList] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   useEffect(() => {
-    const latitude = localStorage.getItem("latitude");
-    if (!latitude) {
-      setModalState(true);
-    }
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/performances");
+        console.log(response.data.dbs.db);
+        setConcertList(response.data.dbs.db); // 이 부분이 올바른지 확인 필요
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
   }, []);
 
-  const closeModal = () => {
-    setModalState(false);
-  }
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % concertList.length);
+    }, 3000); 
+
+    return () => clearInterval(interval); // 컴포넌트 언마운트 시 인터벌 클리어
+  }, [concertList]);
 
   return (
     <Container>
       <TopFrame>
-        {modalState && <Modal closeModal={closeModal} />}
-        <h1 style={{textAlign:"center"}}>오늘 당신 근처의 <br/> 이런 공연은 어떨까요?</h1>
+        <h1>
+          이번달 전국 각지의 <br/> 이런 공연은 어떨까요?
+        </h1>
+        {concertList.length > 0 && (
+          <RowConcertBox
+            key={currentIndex}
+            posterImg={concertList[currentIndex].poster}
+            title={concertList[currentIndex].prfnm}
+            place={concertList[currentIndex].fcltynm}
+            start={concertList[currentIndex].prfpdfrom}
+            end={concertList[currentIndex].prfpdto}
+          />
+        )}
       </TopFrame>
       <Footer />
     </Container>
   );
-}
+};
 
 export default Home;

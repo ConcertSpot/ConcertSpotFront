@@ -10,15 +10,16 @@ const Container = styled.div`
   width: 100%;
   height: 20%;
   background-color: white;
-  border: 2px solid black;
 
     @media (max-width: 768px) {
+      width: 100%;
       height: 10dvh;
       display: flex;
       align-items: center;
       border: none;
       justify-content: space-around;
       background-color: white;
+      border-top: 1px solid #eeeeee;
   }
 `;
 

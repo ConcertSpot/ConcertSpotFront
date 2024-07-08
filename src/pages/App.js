@@ -1,55 +1,36 @@
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import Layout from "../components/Layout";
 import Modal from "../components/Modal";
 
 const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StyledButton = styled.button`
-  width: 150px;
-  height: 50px;
-  background-color: lightsalmon;
-  border-radius: 15px;
-  cursor: pointer;
-`;
-
-const HomeContent = () => {
-
-  const [modalState, setModalState] = useState(false);
-
-  const changeModalState = () => {
-    setModalState(prev => {
-      const newState = !prev
-      return newState
-    })
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: lightgray;
   }
+`;
 
-  useEffect(() => {
-    console.log(modalState)
-  }, [modalState])
+const AppContent = () => {
+
+  const [modalState, setModalState] = useState(true);
 
   const closeModal = () => {
-    return (
-      setModalState(false)
-    )
+    setModalState(false);
   }
 
   return (
     <Container>
-      {modalState && <Modal closeModal={closeModal} /> }
-      <StyledButton onClick={changeModalState}>모달 여는 버튼</StyledButton>
+      {modalState && <Modal closeModal={closeModal} />}
     </Container>
-  )
-}
+  );
+};
 
 const App = () => {
-  return <Layout content={<HomeContent />} />
-}
+  return <Layout content = {<AppContent/>} />
+};
 
 export default App;

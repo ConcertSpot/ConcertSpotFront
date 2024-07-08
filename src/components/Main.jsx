@@ -4,13 +4,12 @@ import styled from "styled-components";
 const Container = styled.div`
   width: 100%;
   height: 60%;
-  background-color: white;
-  border: 2px solid black;
+  background-color: gray;
 
     @media (max-width: 768px) {
-    height: 20dvh;
-    background-color: lightgray;
-  }
+      height: 80dvh;
+      background-color: lightgray;
+    }
 `;
 
 const Main = ( {LayoutMain} ) => {

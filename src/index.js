@@ -6,14 +6,17 @@ import "./index.css";
 import App from './pages/App';
 import Home from './pages/Home';
 import Map from './pages/Map';
+import Test from './pages/Test';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
     <React.StrictMode>
       <Routes>
-        <Route path="/" element={<Home/>} />
+        <Route path="/" element={<App />} />
+        <Route path="/Home" element={<Home/>} />
         <Route path="/Map" element={<Map />} />
+        <Route path="/test" element={<Test />} />
       </Routes>
     </React.StrictMode>
   </BrowserRouter>

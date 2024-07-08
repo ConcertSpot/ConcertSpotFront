@@ -7,10 +7,14 @@ import Footer from "../components/Footer";
 const Container = styled.div`
   width: 100%;
   height: 100vh;
-  background-color: salmon;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: red;
 
     @media (max-width: 768px) {
-      width: 100%:
+      width: 100%;
       height: 100dvh;
       background-color: lightgray;
   }
@@ -19,9 +23,11 @@ const Container = styled.div`
 const Layout = ( {content} ) => {
   return (
     <Container>
-      <Header/>
-      <Main LayoutMain={content} />
-      <Footer/>
+      <Header></Header>
+      <Main
+        LayoutMain={content}
+      />
+      <Footer></Footer>
     </Container>
   )
 }
