@@ -149,6 +149,9 @@ const Map = () => {
         const truncatedRnMgtSn = rnMgtSn.substring(0, 4);
         console.log(truncatedRnMgtSn)
         setTruncatedData(truncatedRnMgtSn);
+
+        const postresponse = await axios.post('http://localhost:8000/submitCode', { code: truncatedRnMgtSn });
+        console.log(postresponse.data.dbs.db);
       }
     } catch (error) {
       console.error("Error fetching data: ", error);
