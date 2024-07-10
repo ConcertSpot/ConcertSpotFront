@@ -54,7 +54,7 @@ const Footer = () => {
       <IconFrame to="/"><IoHome /></IconFrame>
       <IconFrame to="/Map"><FaSearchLocation /></IconFrame>
       <IconFrame><FaUserLock /></IconFrame>
-      <IconFrame><CgMenuGridR /></IconFrame>
+      <IconFrame to="/test"><CgMenuGridR /></IconFrame>
     </Container>
   )
 }

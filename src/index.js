@@ -7,6 +7,7 @@ import App from './pages/App';
 import Home from './pages/Home';
 import Map from './pages/Map';
 import Test from './pages/Test';
+import Test2 from './pages/Test2';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,7 +17,8 @@ root.render(
         <Route path="/" element={<App />} />
         <Route path="/Home" element={<Home/>} />
         <Route path="/Map" element={<Map />} />
-        <Route path="/test" element={<Test />} />
+        <Route path="/Test" element={<Test />} />
+        <Route path="/Test2" element={<Test2 />} />
       </Routes>
     </React.StrictMode>
   </BrowserRouter>

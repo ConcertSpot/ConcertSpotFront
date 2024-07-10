@@ -1,74 +1,70 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import Layout from "../components/Layout";
 
-const KakaoMap = () => {
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: lightsalmon;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Result = styled.div`
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: bold;
+`;
+
+const TestContent = () => {
+  const [address, setAddress] = useState("");
+  const [isKakaoLoaded, setIsKakaoLoaded] = useState(false);
+
   useEffect(() => {
-    const existingScript = document.getElementById('kakao-map-script');
-    if (!existingScript) {
-      const script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=ed218e43e083f32fc9b2e645cbee237d&autoload=false`;
-      script.async = true;
-      script.id = 'kakao-map-script';
-      document.head.appendChild(script);
+    const checkKakaoLoaded = setInterval(() => {
+      if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
+        setIsKakaoLoaded(true);
+        clearInterval(checkKakaoLoaded);
+      }
+    }, 100);
 
-      script.onload = () => {
-        window.kakao.maps.load(() => {
-          const mapContainer = document.getElementById('map');
-          const mapOption = {
-            center: new window.kakao.maps.LatLng(33.450701, 126.570667),
-            level: 3
-          };
-          const map = new window.kakao.maps.Map(mapContainer, mapOption);
-
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
-              const { latitude, longitude } = position.coords;
-              const locPosition = new window.kakao.maps.LatLng(latitude, longitude);
-              const message = '<div style="padding:5px;">You are here!</div>';
-
-              const marker = new window.kakao.maps.Marker({
-                map: map,
-                position: locPosition
-              });
-
-              const infowindow = new window.kakao.maps.InfoWindow({
-                content: message,
-                removable: true
-              });
-
-              infowindow.open(map, marker);
-              map.setCenter(locPosition);
-            }, error => {
-              console.error('Error getting geolocation: ', error);
-            });
-          } else {
-            const locPosition = new window.kakao.maps.LatLng(33.450701, 126.570667);
-            const message = 'Geolocation is not supported by this browser.';
-
-            const marker = new window.kakao.maps.Marker({
-              map: map,
-              position: locPosition
-            });
-
-            const infowindow = new window.kakao.maps.InfoWindow({
-              content: message,
-              removable: true
-            });
-
-            infowindow.open(map, marker);
-            map.setCenter(locPosition);
-          }
-        });
-      };
-
-      script.onerror = () => {
-        console.error('Kakao Maps script could not be loaded.');
-      };
-    }
+    return () => clearInterval(checkKakaoLoaded);
   }, []);
 
+  useEffect(() => {
+    if (!isKakaoLoaded) return;
+
+    const latitude = localStorage.getItem("latitude");
+    const longitude = localStorage.getItem("longitude");
+
+    if (!latitude || !longitude) {
+      setAddress("위도와 경도 값이 localStorage에 없습니다.");
+      return;
+    }
+
+    const geocoder = new window.kakao.maps.services.Geocoder();
+    const coord = new window.kakao.maps.LatLng(latitude, longitude);
+
+    geocoder.coord2Address(coord.getLng(), coord.getLat(), (result, status) => {
+      if (status === window.kakao.maps.services.Status.OK) {
+        setAddress(result[0].address.address_name);
+      } else {
+        setAddress("주소를 변환할 수 없습니다.");
+      }
+    });
+  }, [isKakaoLoaded]);
+
   return (
-    <div id="map" style={{ width: '100%', height: '350px' }}></div>
+    <Container>
+      {address && <Result>주소: {address}</Result>}
+    </Container>
   );
 };
 
-export default KakaoMap;
+const Test = () => {
+  return <Layout content={<TestContent />} />;
+};
+
+export default Test;

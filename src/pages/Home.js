@@ -24,9 +24,9 @@ const textUp = keyframes`
     transform: translateY(-35dvh);
   }
 `;
-
+   
 // styled-component 영역
-
+  
 const Container = styled.div`
   width: 100%;
   height: 100%;
@@ -80,7 +80,8 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/performances");
+        const response = await axios.get("http://localhost:8000/performances");
+        // "https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/performances"
         console.log(response.data.dbs.db);
         setConcertList(response.data.dbs.db); // 이 부분이 올바른지 확인 필요
       } catch (error) {
@@ -112,6 +113,7 @@ const Home = () => {
             place={concertList[currentIndex].fcltynm}
             start={concertList[currentIndex].prfpdfrom}
             end={concertList[currentIndex].prfpdto}
+            state={concertList[currentIndex].prfstate}
           />
         )}
       </TopFrame>

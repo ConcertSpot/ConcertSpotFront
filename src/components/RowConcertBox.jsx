@@ -6,7 +6,7 @@ const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background: white;
   overflow-y: hidden;
 `;
 
@@ -33,7 +33,20 @@ const TextFrame = styled.div`
   text-align: center;
 `;
 
-const RowConcertBox = ({ posterImg, title, place, start, end }) => {
+const TitleFrame = styled.div`
+  width: 100%;
+  height: 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ExplainFrame = styled.div`
+  width: 100%;
+  height: 20%;
+`;
+
+const RowConcertBox = ({ posterImg, title, place, start, end, state }) => {
   return (
     <Container>
       <SpaceFrame/>
@@ -45,9 +58,18 @@ const RowConcertBox = ({ posterImg, title, place, start, end }) => {
         />
       </ImgFrame>
       <TextFrame>
-        <h3>{title}</h3>
-        <span>{place}</span>
-        {start} ~ {end}
+        <TitleFrame>
+          <h3>{title}</h3>
+        </TitleFrame>
+        <ExplainFrame>
+          <span>{place}</span>
+        </ExplainFrame>
+        <ExplainFrame>
+          {start} ~ {end}
+        </ExplainFrame>
+        <ExplainFrame>
+          <span style={{color:"red", fontWeight:"bold"}}>{state}</span>
+        </ExplainFrame>
       </TextFrame>
     </Container>
   );
