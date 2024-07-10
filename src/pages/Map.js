@@ -60,6 +60,8 @@ const Map = () => {
   const [addressResult, setAddressResult] = useState("");
   const [data, setData] = useState(null);
   const [truncatedData, setTruncatedData] = useState("");
+  const [postResponse, setPostResponse] = useState([]);
+  const [concertCoordinates, setConcertCoordinates] = useState([]);
   const apiKey = "devU01TX0FVVEgyMDI0MDcxMDE5MjIzNTExNDkxMjg=";
 
   useEffect(() => {
@@ -105,7 +107,7 @@ const Map = () => {
               setAddressResult(result[0].address_name);
 
               // 주소를 기반으로 데이터 검색
-              fetchData(result[0].address_name);
+              fetchData(result[0].address_name, map);
             } else {
               console.error("Failed to search address:", status);
             }
@@ -119,7 +121,7 @@ const Map = () => {
         geocoder.coord2Address(coord.getLng(), coord.getLat(), (result, status) => {
           if (status === window.kakao.maps.services.Status.OK) {
             setAddressResult(result[0].address.address_name);
-            fetchData(result[0].address.address_name);
+            fetchData(result[0].address.address_name, map);
           } else {
             setAddressResult("주소를 변환할 수 없습니다.");
           }
@@ -138,7 +140,7 @@ const Map = () => {
     };
   }, [latitude, longitude, address]);
 
-  const fetchData = async (address) => {
+  const fetchData = async (address, map) => {
     try {
       const response = await axios.get(
         `https://business.juso.go.kr/addrlink/addrLinkApi.do?currentPage=1&countPerPage=10&keyword=${encodeURIComponent(address)}&confmKey=${apiKey}&resultType=json`
@@ -150,8 +152,25 @@ const Map = () => {
         console.log(truncatedRnMgtSn)
         setTruncatedData(truncatedRnMgtSn);
 
-        const postresponse = await axios.post('http://localhost:8000/submitCode', { code: truncatedRnMgtSn });
-        console.log(postresponse.data.dbs.db);
+        const postResponse = await axios.post('https://web-concertspotfront-lxw4rw2ief7129ee.sel5.cloudtype.app/submitCode', { code: truncatedRnMgtSn });
+        console.log(postResponse.data[0].dbs.db[0].la[0], postResponse.data[0].dbs.db[0].lo[0]);
+        setPostResponse(postResponse.data);
+        console.log(postResponse.data); // 바로 여기서 postResponse 데이터를 콘솔에 출력
+
+        // concertCoordinates 설정 및 마커 추가
+        const coordinates = postResponse.data.map((item, index) => ({
+          la: item.dbs.db[0].la[0],
+          lo: item.dbs.db[0].lo[0]
+        }));
+        setConcertCoordinates(coordinates);
+
+        coordinates.forEach(coord => {
+          const markerPosition = new window.kakao.maps.LatLng(coord.la, coord.lo);
+          const marker = new window.kakao.maps.Marker({
+            position: markerPosition,
+          });
+          marker.setMap(map);
+        });
       }
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -183,6 +202,5 @@ const Map = () => {
     </Container>
   );
 };
-
 
 export default Map;
