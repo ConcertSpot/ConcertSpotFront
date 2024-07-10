@@ -152,7 +152,7 @@ const Map = () => {
         console.log(truncatedRnMgtSn)
         setTruncatedData(truncatedRnMgtSn);
 
-        const postResponse = await axios.post('https://web-concertspotfront-lxw4rw2ief7129ee.sel5.cloudtype.app/submitCode', { code: truncatedRnMgtSn });
+        const postResponse = await axios.post('https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/submitCode', { code: truncatedRnMgtSn });
         console.log(postResponse.data[0].dbs.db[0].la[0], postResponse.data[0].dbs.db[0].lo[0]);
         setPostResponse(postResponse.data);
         console.log(postResponse.data); // 바로 여기서 postResponse 데이터를 콘솔에 출력
