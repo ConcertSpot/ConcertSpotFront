@@ -151,7 +151,7 @@ const Map = () => {
         const truncatedRnMgtSn = rnMgtSn.substring(0, 4);
         console.log(truncatedRnMgtSn);
         setTruncatedData(truncatedRnMgtSn);
-        const postResponse = await axios.post('https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/performances/submitCode', { code: truncatedRnMgtSn });
+        const postResponse = await axios.post('https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/submitCode', { code: truncatedRnMgtSn });
         // https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/submitCode
         console.log("전체 출력값임:", postResponse.data);
         setPostResponse(postResponse.data);
