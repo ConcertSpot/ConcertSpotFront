@@ -66,8 +66,9 @@ const List = () => {
   useEffect(() => {
     const listItem = localStorage.getItem("ListItem");
     if (listItem) {
-      setPostResponse(JSON.parse(listItem)); // JSON.parse로 문자열을 객체 배열로 변환
-      console.log(postResponse.data);
+      const parsedListItem = JSON.parse(listItem);
+      setPostResponse(parsedListItem); // JSON.parse로 문자열을 객체 배열로 변환
+      console.log(parsedListItem);
     }
   }, []);
 
@@ -88,14 +89,19 @@ const List = () => {
         {postResponse.length > 0 ? (
           postResponse.map((item, index) => {
             const performance = item.detail?.dbs?.db?.[0];
-            return performance ? (
-              <PerformanceDetail
-                key={index}
-                performance={performance.poster}
-                title={performance.prfnm}
-                onClick={() => handlePerformanceClick(performance)}
-              />
-            ) : null;
+            if (performance) {
+              return (
+                <PerformanceDetail
+                  key={index}
+                  performance={performance.poster}
+                  title={performance.prfnm}
+                  onClick={() => handlePerformanceClick(performance)}
+                />
+              );
+            } else {
+              console.error("Invalid item structure", item);
+              return null;
+            }
           })
         ) : (
           <p>No data available</p>
