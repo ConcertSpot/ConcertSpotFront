@@ -53,8 +53,8 @@ const Footer = () => {
     <Container>
       <IconFrame to="/"><IoHome /></IconFrame>
       <IconFrame to="/Map"><FaSearchLocation /></IconFrame>
-      <IconFrame><FaUserLock /></IconFrame>
-      <IconFrame to="/test"><CgMenuGridR /></IconFrame>
+      <IconFrame to="/List"><CgMenuGridR /></IconFrame>
+      <IconFrame to="/test"><FaUserLock /></IconFrame>
     </Container>
   )
 }

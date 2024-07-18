@@ -149,23 +149,35 @@ const Map = () => {
       if (response.data.results.juso.length > 0) {
         const rnMgtSn = response.data.results.juso[0].rnMgtSn;
         const truncatedRnMgtSn = rnMgtSn.substring(0, 4);
-        console.log(truncatedRnMgtSn)
+        console.log(truncatedRnMgtSn);
         setTruncatedData(truncatedRnMgtSn);
-
-        const postResponse = await axios.post('https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/submitCode', { code: truncatedRnMgtSn });
-        console.log(postResponse.data[0].dbs.db[0].la[0], postResponse.data[0].dbs.db[0].lo[0]);
+        const postResponse = await axios.post('https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/performances/submitCode', { code: truncatedRnMgtSn });
+        // https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/submitCode
+        console.log("전체 출력값임:", postResponse.data);
         setPostResponse(postResponse.data);
-        console.log(postResponse.data); // 바로 여기서 postResponse 데이터를 콘솔에 출력
-
+        localStorage.setItem('ListItem', JSON.stringify(postResponse.data)); // JSON.stringify로 객체 배열을 문자열로 변환하여 저장
+        console.log("setData임:", response.data);
+  
         // concertCoordinates 설정 및 마커 추가
-        const coordinates = postResponse.data.map((item, index) => ({
-          la: item.dbs.db[0].la[0],
-          lo: item.dbs.db[0].lo[0]
-        }));
-        setConcertCoordinates(coordinates);
-
-        coordinates.forEach(coord => {
-          const markerPosition = new window.kakao.maps.LatLng(coord.la, coord.lo);
+        const combinedResults = postResponse.data.map((item, index) => {
+          if (item.performance && item.detail && item.place) {
+            return {
+              performance: item.performance,
+              detail: item.detail,
+              place: item.place,
+            };
+          } else {
+            console.error("Invalid item structure", item);
+            return null;
+          }
+        }).filter(item => item !== null);
+        
+        setConcertCoordinates(combinedResults);
+  
+        combinedResults.forEach(coord => {
+          const la = coord.place.dbs.db[0].la[0];
+          const lo = coord.place.dbs.db[0].lo[0];
+          const markerPosition = new window.kakao.maps.LatLng(la, lo);
           const marker = new window.kakao.maps.Marker({
             position: markerPosition,
           });
