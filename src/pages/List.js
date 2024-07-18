@@ -48,14 +48,12 @@ const TitleArea = styled.div`
 `;
 
 const PerformanceDetail = ({ performance, title, onClick }) => {
-  const truncatedProduct = title.length > 10 ? title.substring(0, 22) + "..." : title;
+  const truncatedProduct = title.length > 10 ? title.substring(0, 20) + "..." : title;
 
   return (
     <PerformanceContainer onClick={onClick}>
       {performance ? <img src={performance} style={{ width: "100%", height: "80%" }} alt="Performance Poster" /> : "No poster available"}
-      <TitleArea>
-        {truncatedProduct}
-      </TitleArea>
+      <TitleArea>{truncatedProduct}</TitleArea>
     </PerformanceContainer>
   );
 };
@@ -88,14 +86,17 @@ const List = () => {
       {modalState && <DetailModal performance={selectedPerformance} onClose={closeModal} />}
       <TopFrame>
         {postResponse.length > 0 ? (
-          postResponse.map((item, index) => (
-            <PerformanceDetail
-              key={index}
-              performance={item.detail.dbs.db[0].poster}
-              title={item.detail.dbs.db[0].prfnm[0]}
-              onClick={() => handlePerformanceClick(item.detail.dbs.db[0])}
-            />
-          ))
+          postResponse.map((item, index) => {
+            const performance = item.detail?.dbs?.db?.[0];
+            return performance ? (
+              <PerformanceDetail
+                key={index}
+                performance={performance.poster}
+                title={performance.prfnm}
+                onClick={() => handlePerformanceClick(performance)}
+              />
+            ) : null;
+          })
         ) : (
           <p>No data available</p>
         )}
