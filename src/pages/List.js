@@ -94,7 +94,7 @@ const List = () => {
                 <PerformanceDetail
                   key={index}
                   performance={performance.poster}
-                  title={performance.prfnm}
+                  title={performance.prfnm[0]}
                   onClick={() => handlePerformanceClick(performance)}
                 />
               );
