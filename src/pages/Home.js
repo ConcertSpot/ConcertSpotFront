@@ -81,42 +81,48 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get("https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/performances");
-        // "https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/performances"
         console.log(response.data.dbs.db);
-        setConcertList(response.data.dbs.db); // 이 부분이 올바른지 확인 필요
+        setConcertList(response.data.dbs.db);
       } catch (error) {
         console.log(error);
       }
     };
     fetchData();
   }, []);
-
+  
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % concertList.length);
-    }, 3000); 
-
-    return () => clearInterval(interval); // 컴포넌트 언마운트 시 인터벌 클리어
+    if (concertList.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % concertList.length);
+      }, 3000);
+  
+      return () => clearInterval(interval);
+    }
   }, [concertList]);
+  
+  const handleImageLoad = () => {
+    console.log("Image loaded");
+  };
 
   return (
     <Container>
-      <TopFrame>
-        <h1>
-          이번달 전국 각지의 <br/> 이런 공연은 어떨까요?
-        </h1>
-        {concertList.length > 0 && (
-          <RowConcertBox
-            key={currentIndex}
-            posterImg={concertList[currentIndex].poster}
-            title={concertList[currentIndex].prfnm}
-            place={concertList[currentIndex].fcltynm}
-            start={concertList[currentIndex].prfpdfrom}
-            end={concertList[currentIndex].prfpdto}
-            state={concertList[currentIndex].prfstate}
-          />
-        )}
-      </TopFrame>
+    <TopFrame>
+      <h1>
+        이번달 전국 각지의 <br /> 이런 공연은 어떨까요?
+      </h1>
+      {concertList.length > 0 && (
+        <RowConcertBox
+          key={currentIndex}
+          posterImg={concertList[currentIndex].poster}
+          title={concertList[currentIndex].prfnm}
+          place={concertList[currentIndex].fcltynm}
+          start={concertList[currentIndex].prfpdfrom}
+          end={concertList[currentIndex].prfpdto}
+          state={concertList[currentIndex].prfstate}
+          onLoad={handleImageLoad} // 이미지 로드 이벤트 추가
+        />
+      )}
+    </TopFrame>
       <Footer />
     </Container>
   );
