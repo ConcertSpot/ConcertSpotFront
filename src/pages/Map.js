@@ -202,14 +202,6 @@ const Map = () => {
         <button id="search-btn" style={{ position: "absolute", top: "10px", right: "10px", zIndex: 200 }}>Search</button>
         <div id="map" style={{ width: "100%", height: "100%", zIndex: 100 }}></div>
       </TopFrame>
-      {addressResult && <Result>주소: {addressResult}</Result>}
-      {data ? (
-        <Results>
-          <p>도로명코드(앞 4자리): {truncatedData}</p>
-        </Results>
-      ) : (
-        <p>Loading...</p>
-      )}
       <Footer />
     </Container>
   );
