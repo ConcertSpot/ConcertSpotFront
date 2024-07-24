@@ -72,7 +72,9 @@ const StyledButton = styled.button`
 const DetailModal = ({ performance, onClose }) => {
   if (!performance) return null;
 
-  console.log(performance);
+  const handleClick = () => {
+    window.open(performance.relates[0].relate[0].relateurl[0], '_blank');
+  };
 
   return (
     <ModalOverlay onClick={onClose}>
@@ -86,32 +88,33 @@ const DetailModal = ({ performance, onClose }) => {
           <h2 style={{ textAlign: "center" }}>{performance.prfnm}</h2>
           <StyledHr />
 
-            <span style={{color:"gray" ,fontWeight:"bold"}}>장르 </span>
-            <span style={{marginTop:"0px"}}>{performance.genrenm}</span>
-            
-            <span style={{color:"gray" ,fontWeight:"bold"}}>장소 </span>
-            <span style={{marginTop:"0px"}}>{performance.fcltynm}</span>
-            
-            <span style={{color:"gray" ,fontWeight:"bold"}}>예매가격 </span>
-            <span style={{marginTop:"0px"}}>{performance.pcseguidance}</span>
+          <span style={{ color: "gray", fontWeight: "bold" }}>장르 </span>
+          <span style={{ marginTop: "0px" }}>{performance.genrenm}</span>
 
-            <span style={{color:"gray" ,fontWeight:"bold"}}>상영시간 </span>
-            <span style={{marginTop:"0px"}}>{performance.dtguidance} {performance.prfruntime}</span>
+          <span style={{ color: "gray", fontWeight: "bold" }}>장소 </span>
+          <span style={{ marginTop: "0px" }}>{performance.fcltynm}</span>
 
-            <span style={{color:"gray" ,fontWeight:"bold"}}>날짜 </span>
-            <span style={{marginTop:"0px"}}>{performance.prfpdfrom} ~ {performance.prfpdto}</span>
-            
-            <span style={{color:"gray" ,fontWeight:"bold"}}>출현진 </span>
-            <span style={{marginTop:"0px"}}>{performance.prfcast}</span>
-            
-            <span style={{color:"gray" ,fontWeight:"bold"}}>제작진 </span>
-            <span style={{marginTop:"0px"}}>{performance.prfcrew}</span>
+          <span style={{ color: "gray", fontWeight: "bold" }}>예매가격 </span>
+          <span style={{ marginTop: "0px" }}>{performance.pcseguidance}</span>
+
+          <span style={{ color: "gray", fontWeight: "bold" }}>상영시간 </span>
+          <span style={{ marginTop: "0px" }}>{performance.dtguidance} {performance.prfruntime}</span>
+
+          <span style={{ color: "gray", fontWeight: "bold" }}>날짜 </span>
+          <span style={{ marginTop: "0px" }}>{performance.prfpdfrom} ~ {performance.prfpdto}</span>
+
+          <span style={{ color: "gray", fontWeight: "bold" }}>출현진 </span>
+          <span style={{ marginTop: "0px" }}>{performance.prfcast}</span>
+
+          <span style={{ color: "gray", fontWeight: "bold" }}>제작진 </span>
+          <span style={{ marginTop: "0px" }}>{performance.prfcrew}</span>
 
           <ButtonArea>
             <StyledButton onClick={onClose}>닫기</StyledButton>
-            <StyledButton onClick={onClose} style={{backgroundColor:"lightgray"}}>예매하기</StyledButton>
+            <StyledButton onClick={handleClick} style={{ backgroundColor: "lightgray" }}>
+              예매하기
+            </StyledButton>
           </ButtonArea>
-
         </ModalContentBottom>
       </ModalContent>
     </ModalOverlay>

@@ -20,7 +20,7 @@ const TopFrame = styled.div`
   height: 90dvh;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   background-color: white;
   flex-wrap: wrap;
