@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import Footer from "../components/Footer";
 import Layout from "../components/Layout";
 import axios from "axios";
+import { FaSearchLocation } from "react-icons/fa";
+import DetailModal from "../components/DetailModal";
 
 const Container = styled.div`
   width: 100%;
@@ -23,7 +25,7 @@ const TopFrame = styled.div`
   border: 1px solid black;
 
   @media (max-width: 768px) {
-    height: 90dvh;
+    height: 85dvh;
     border: none;
     display: flex;
     align-items: center;
@@ -37,19 +39,49 @@ const TopFrame = styled.div`
   }
 `;
 
-const Result = styled.div`
-  margin-top: 20px;
-  font-size: 16px;
-  font-weight: bold;
+const SearchArea = styled.div`
+  @media (max-width: 768px) {
+    height: 5dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: none;
+  }
 `;
 
-const Results = styled.div`
-  margin-top: 20px;
-  width: 80%;
+const StyledInput = styled.input`
+  width: 85%;
+  height: 100%;
+  padding-left: 5%;
+  font-size: 18px;
+  border: 1px solid transparent;
+  outline: none;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: black;
+    box-shadow: 0 0 0 2px rgba(255, 192, 203, 0.3);
+  }
+
+  &::placeholder {
+    color: #999;
+    transition: opacity 0.3s ease;
+  }
+
+  &:focus::placeholder {
+    opacity: 0;
+  }
+`;
+
+const StyledButton = styled.button`
+  width: 15%;
+  height: 100%;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
   background-color: white;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-left: 1px solid lightgray;
 `;
 
 const Map = () => {
@@ -62,7 +94,71 @@ const Map = () => {
   const [truncatedData, setTruncatedData] = useState("");
   const [postResponse, setPostResponse] = useState([]);
   const [concertCoordinates, setConcertCoordinates] = useState([]);
+  const [selectedPerformance, setSelectedPerformance] = useState(null);
+  const [modalState, setModalState] = useState(false);
   const apiKey = "devU01TX0FVVEgyMDI0MDcxMDE5MjIzNTExNDkxMjg=";
+
+  const createPerformanceMarkers = useCallback((performances, map) => {
+    performances.forEach(performance => {
+      const la = performance.place.dbs.db[0].la[0];
+      const lo = performance.place.dbs.db[0].lo[0];
+      const markerPosition = new window.kakao.maps.LatLng(la, lo);
+      const marker = new window.kakao.maps.Marker({
+        position: markerPosition,
+      });
+      marker.setMap(map);
+    
+      // 마커 클릭 이벤트
+      window.kakao.maps.event.addListener(marker, 'click', function() {
+        console.log("Marker clicked:", performance.detail.dbs.db[0]);
+  
+        // 선택된 마커 위치로 지도 이동
+        map.panTo(markerPosition);
+  
+        setSelectedPerformance(performance.detail.dbs.db[0]);  // 선택된 공연 설정
+        setModalState(true);  // 모달 열기
+      });
+    });
+  }, []);
+  
+
+  const fetchData = useCallback(async (address, map) => {
+    try {
+      const response = await axios.get(
+        `https://business.juso.go.kr/addrlink/addrLinkApi.do?currentPage=1&countPerPage=10&keyword=${encodeURIComponent(address)}&confmKey=${apiKey}&resultType=json`
+      );
+      setData(response.data);
+      if (response.data.results.juso.length > 0) {
+        const rnMgtSn = response.data.results.juso[0].rnMgtSn;
+        const truncatedRnMgtSn = rnMgtSn.substring(0, 4);
+        console.log(truncatedRnMgtSn);
+        setTruncatedData(truncatedRnMgtSn);
+        const postResponse = await axios.post('https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/submitCode', { code: truncatedRnMgtSn });
+        console.log("전체 출력값임:", postResponse.data);
+        setPostResponse(postResponse.data);
+        localStorage.setItem('ListItem', JSON.stringify(postResponse.data));
+        console.log("setData임:", response.data);
+
+        const combinedResults = postResponse.data.map((item, index) => {
+          if (item.performance && item.detail && item.place) {
+            return {
+              performance: item.performance,
+              detail: item.detail,
+              place: item.place,
+            };
+          } else {
+            console.error("Invalid item structure", item);
+            return null;
+          }
+        }).filter(item => item !== null);
+
+        setConcertCoordinates(combinedResults);
+        createPerformanceMarkers(combinedResults, map);
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  }, [createPerformanceMarkers]);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -76,13 +172,23 @@ const Map = () => {
         const options = {
           center: new window.kakao.maps.LatLng(latitude, longitude),
           level: 3,
+          draggable: true, // 드래그 기능 활성화
         };
         const map = new window.kakao.maps.Map(container, options);
+        
+
+        // 빨간색 마커 이미지 생성
+        const markerImage = new window.kakao.maps.MarkerImage(
+          'https://cdn.pixabay.com/photo/2014/04/03/10/03/google-309740_960_720.png',
+          new window.kakao.maps.Size(28, 45),
+          { offset: new window.kakao.maps.Point(13, 35) }
+        );
 
         // 마커를 생성하고 설정합니다.
         const markerPosition = new window.kakao.maps.LatLng(latitude, longitude);
         const marker = new window.kakao.maps.Marker({
           position: markerPosition,
+          image: markerImage // 빨간색 마커 이미지 적용
         });
 
         // 마커를 지도에 추가합니다.
@@ -138,70 +244,33 @@ const Map = () => {
         document.head.removeChild(script);
       }
     };
-  }, [latitude, longitude, address]);
+  }, [latitude, longitude, address, fetchData]);
 
-  const fetchData = async (address, map) => {
-    try {
-      const response = await axios.get(
-        `https://business.juso.go.kr/addrlink/addrLinkApi.do?currentPage=1&countPerPage=10&keyword=${encodeURIComponent(address)}&confmKey=${apiKey}&resultType=json`
-      );
-      setData(response.data);
-      if (response.data.results.juso.length > 0) {
-        const rnMgtSn = response.data.results.juso[0].rnMgtSn;
-        const truncatedRnMgtSn = rnMgtSn.substring(0, 4);
-        console.log(truncatedRnMgtSn);
-        setTruncatedData(truncatedRnMgtSn);
-        const postResponse = await axios.post('https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/submitCode', { code: truncatedRnMgtSn });
-        // https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/submitCode
-        console.log("전체 출력값임:", postResponse.data);
-        setPostResponse(postResponse.data);
-        localStorage.setItem('ListItem', JSON.stringify(postResponse.data)); // JSON.stringify로 객체 배열을 문자열로 변환하여 저장
-        console.log("setData임:", response.data);
-  
-        // concertCoordinates 설정 및 마커 추가
-        const combinedResults = postResponse.data.map((item, index) => {
-          if (item.performance && item.detail && item.place) {
-            return {
-              performance: item.performance,
-              detail: item.detail,
-              place: item.place,
-            };
-          } else {
-            console.error("Invalid item structure", item);
-            return null;
-          }
-        }).filter(item => item !== null);
-        
-        setConcertCoordinates(combinedResults);
-  
-        combinedResults.forEach(coord => {
-          const la = coord.place.dbs.db[0].la[0];
-          const lo = coord.place.dbs.db[0].lo[0];
-          const markerPosition = new window.kakao.maps.LatLng(la, lo);
-          const marker = new window.kakao.maps.Marker({
-            position: markerPosition,
-          });
-          marker.setMap(map);
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching data: ", error);
-    }
-  };
+  const closeModal = useCallback(() => {
+    setModalState(false);
+    setSelectedPerformance(null);
+  }, []);
+
+  console.log("Modal state:", modalState);
+  console.log("Selected performance:", selectedPerformance);
 
   return (
     <Container>
-      <TopFrame>
-        <input 
+      <SearchArea>
+        <StyledInput 
           type="text" 
           value={address} 
           onChange={(e) => setAddress(e.target.value)} 
-          placeholder="Enter address" 
-          style={{ position: "absolute", top: "10px", zIndex: 200, width: "80%" }} 
+          placeholder="다른 지역 검색" 
         />
-        <button id="search-btn" style={{ position: "absolute", top: "10px", right: "10px", zIndex: 200 }}>Search</button>
+        <StyledButton id="search-btn"><FaSearchLocation /></StyledButton>
+      </SearchArea>
+      <TopFrame>
         <div id="map" style={{ width: "100%", height: "100%", zIndex: 100 }}></div>
       </TopFrame>
+      {modalState && selectedPerformance && (
+        <DetailModal performance={selectedPerformance} onClose={closeModal} />
+      )}
       <Footer />
     </Container>
   );

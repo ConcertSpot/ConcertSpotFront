@@ -8,14 +8,13 @@ const Container = styled.div`
 
   @media (max-width: 768px) {
     height: 10dvh;
-    background-color: white;
+    background-color: lightgray;
   }
 `;
 
 const Header = () => {
   return ( 
     <Container>
-      헤더임
     </Container>
   )
 }
