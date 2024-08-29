@@ -38,7 +38,7 @@ const ModalContentBottom = styled.div`
   align-items: flex-start;
   justify-content: space-around;
   padding: 20px;
-  
+
   & > span {
     margin-top: 10px;
   }
@@ -114,19 +114,13 @@ const DetailModal = ({ performance, onClose }) => {
   const handleShare = useCallback(() => {
     if (!isKakaoInitialized) {
       console.error('Kakao SDK is not initialized');
-      alert('카카오톡 공유 기능을 초기화하는 중입니다. 잠시 후 다시 시도해주세요.');
-      return;
-    }
-
-    if (!window.Kakao || !window.Kakao.Link) {
-      console.error('Kakao SDK is not available');
-      alert('카카오톡 공유 기능을 사용할 수 없습니다. 잠시 후 다시 시도해주세요.');
+      alert('공유 기능을 초기화하는 중입니다. 잠시 후 다시 시도해주세요.');
       return;
     }
 
     const shareUrl = performance?.relates?.[0]?.relate?.[0]?.relateurl?.[0] || window.location.href;
 
-    try {
+    if (window.Kakao.Link) {
       window.Kakao.Link.sendDefault({
         objectType: 'text',
         text: '공연 정보를 확인해보세요!',
@@ -134,10 +128,17 @@ const DetailModal = ({ performance, onClose }) => {
           mobileWebUrl: shareUrl,
           webUrl: shareUrl,
         },
+        buttonTitle: '자세히 보기',
+        installTalk: true,
       });
-    } catch (error) {
-      console.error('Failed to share via Kakao:', error);
-      alert('카카오톡 공유에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } else {
+      // Kakao SDK를 사용할 수 없는 경우 링크 복사
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('공연 링크가 클립보드에 복사되었습니다.');
+      }).catch(err => {
+        console.error('링크 복사 중 오류가 발생했습니다:', err);
+        alert('링크 복사에 실패했습니다. 직접 주소를 복사해주세요.');
+      });
     }
   }, [isKakaoInitialized, performance]);
 
@@ -154,7 +155,7 @@ const DetailModal = ({ performance, onClose }) => {
         <ModalContentBottom>
           <div style={{width: "100%", display: "flex", flexDirection: "row", justifyContent:"space-between", alignItems: "center"}}>
             <h2 style={{ textAlign: "center", margin: 0 }}>{performance.prfnm || '제목 없음'}</h2>
-            <ShareButton onClick={handleShare}>카카오톡 공유</ShareButton>
+            <ShareButton onClick={handleShare}>공유하기</ShareButton>
           </div>
           <StyledHr />
 
