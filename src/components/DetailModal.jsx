@@ -92,11 +92,12 @@ const DetailModal = ({ performance, onClose }) => {
       const ticketUrl = performance.relates[0].relate[0].relateurl[0];
 
       kakao.Link.sendDefault({
-        objectType: "feed",
+        objectType: "location",
+        address: `${performance.fcltynm}`,
+        addressTitle: "공연장 위치",
         content: {
           title: "공연정보는 역시 콘서트스팟!",
-          description: `'${performance.prfnm}' 공연 예매 링크: ${ticketUrl}\n\n친구가 같이 보자고 하는 공연이군요! 콘서트스팟에서 더 많은 공연을 확인해보세요.`,
-          description: `'${performance.prfnm}' 공연 예매 링크: ${ticketUrl}\n\n친구가 같이 보자고 하는 공연이군요! 콘서트스팟에서 더 많은 공연을 확인해보세요.`,
+          description: `'${performance.prfnm}' 공연 예매 링크: ${ticketUrl}\n\n`,
           imageUrl: `${performance.poster}`,
           link: {
             mobileWebUrl: sharedUrl,
@@ -105,7 +106,7 @@ const DetailModal = ({ performance, onClose }) => {
         },
         buttons: [
           {
-            title: "내 주변 공연정보 탐색",
+            title: "콘서트스팟 바로가기",
             link: {
               mobileWebUrl: sharedUrl,
               webUrl: sharedUrl,
