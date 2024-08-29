@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 
 const ModalOverlay = styled.div`
@@ -71,19 +71,14 @@ const StyledButton = styled.button`
 `;
 
 const DetailModal = ({ performance, onClose }) => {
-  const [siteUrl, setSiteUrl] = useState("");
-
   useEffect(() => {
-    if (performance && performance.relates) {
-      const url = performance.relates[0].relate[0].relateurl[0];
-      setSiteUrl(url);
-    }
-  }, [performance]);
+    console.log(performance.relates[0].relate[0].relateurl[0]);
+  }, [performance])
 
   if (!performance) return null;
 
   const handleClick = () => {
-    window.open(siteUrl, '_blank');
+    window.open(performance.relates[0].relate[0].relateurl[0], '_blank');
   };
 
   const shareKakao = () => {
@@ -93,27 +88,16 @@ const DetailModal = ({ performance, onClose }) => {
         kakao.init("ed218e43e083f32fc9b2e645cbee237d");
       }
 
+      const sharedUrl = "https://web-concertspotfront-lxw4rw2ief7129ee.sel5.cloudtype.app/"; // 콘서트스팟 메인 페이지 URL
+      const ticketUrl = performance.relates[0].relate[0].relateurl[0];
+
       kakao.Link.sendDefault({
-        objectType: "feed", 
-        content: {
-          title: "공연 정보는 역시 ConcertSpot!",
-          description: "당신에게 공연을 같이 보자고 하네요??",
-          imageUrl:
-            "https://developers.kakao.com/assets/img/about/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png",
-          link: {
-            mobileWebUrl: siteUrl,
-            webUrl: siteUrl,
-          },
+        objectType: "text",
+        text: `콘서트스팟에서 '${performance.prfnm}' 공연 정보를 확인해보세요!\n예매 링크: ${ticketUrl}`,
+        link: {
+          mobileWebUrl: sharedUrl,
+          webUrl: sharedUrl,
         },
-        buttons: [
-          {
-            title: "자세히 보러 가기",
-            link: {
-              mobileWebUrl: siteUrl,
-              webUrl: siteUrl,
-            },
-          },
-        ],
       });
     }
   };
@@ -127,7 +111,7 @@ const DetailModal = ({ performance, onClose }) => {
           )}
         </ModalContentTop>
         <ModalContentBottom>
-          <span style={{ display: "flex", justifyContent: "space-between" }}>
+          <span style={{display: "flex", justifyContent:"space-between"}}>
             <h2 style={{ textAlign: "center" }}>{performance.prfnm}</h2>
             <button onClick={shareKakao}>공유하기</button>
           </span>
