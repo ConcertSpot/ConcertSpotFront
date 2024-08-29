@@ -92,12 +92,25 @@ const DetailModal = ({ performance, onClose }) => {
       const ticketUrl = performance.relates[0].relate[0].relateurl[0];
 
       kakao.Link.sendDefault({
-        objectType: "text",
-        text: `콘서트스팟에서 '${performance.prfnm}' 공연 정보를 확인해보세요!\n예매 링크: ${ticketUrl}`,
-        link: {
-          mobileWebUrl: sharedUrl,
-          webUrl: sharedUrl,
+        objectType: "feed",
+        content: {
+          title: "공연정보는 역시 콘서트스팟!",
+          description: `친구가 당신에게 '${performance.prfnm}' 공연을 같이 보자고 하는군요? \n\n예매 링크: ${ticketUrl}\n\n  콘서트스팟에서 당신 주위의 다양한 콘서트 알아보시는건 어떠세요? \n\n(아래 자세히 보기를 눌러주세요!)`,
+          imageUrl: `${performance.poster}`,
+          link: {
+            mobileWebUrl: sharedUrl,
+            webUrl: sharedUrl,
+          },
         },
+        buttons: [
+          {
+            title: "자세히 보기",
+            link: {
+              mobileWebUrl: sharedUrl,
+              webUrl: sharedUrl,
+            },
+          },
+        ],
       });
     }
   };
