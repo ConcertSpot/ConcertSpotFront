@@ -95,7 +95,7 @@ const DetailModal = ({ performance, onClose }) => {
         objectType: "feed",
         content: {
           title: "공연정보는 역시 콘서트스팟!",
-          description: `친구가 당신에게 '${performance.prfnm}' 공연을 같이 보자고 하는군요? \n\n예매 링크: ${ticketUrl}\n\n  콘서트스팟에서 당신 주위의 다양한 콘서트 알아보시는건 어떠세요? \n\n(아래 자세히 보기를 눌러주세요!)`,
+          description: `'${performance.prfnm}' 공연 예매 링크: ${ticketUrl}\n\n친구가 같이 보자고 하는 공연이군요! 콘서트스팟에서 더 많은 공연을 확인해보세요.`,
           imageUrl: `${performance.poster}`,
           link: {
             mobileWebUrl: sharedUrl,
