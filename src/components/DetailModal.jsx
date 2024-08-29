@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const ModalOverlay = styled.div`
@@ -71,10 +71,19 @@ const StyledButton = styled.button`
 `;
 
 const DetailModal = ({ performance, onClose }) => {
+  const [siteUrl, setSiteUrl] = useState("");
+
+  useEffect(() => {
+    if (performance && performance.relates) {
+      const url = performance.relates[0].relate[0].relateurl[0];
+      setSiteUrl(url);
+    }
+  }, [performance]);
+
   if (!performance) return null;
 
   const handleClick = () => {
-    window.open(performance.relates[0].relate[0].relateurl[0], '_blank');
+    window.open(siteUrl, '_blank');
   };
 
   const shareKakao = () => {
@@ -88,20 +97,20 @@ const DetailModal = ({ performance, onClose }) => {
         objectType: "feed", 
         content: {
           title: "공연 정보는 역시 ConcertSpot!",
-          description: "당신에게 공연을 같이보자고 하네요??",
+          description: "당신에게 공연을 같이 보자고 하네요??",
           imageUrl:
             "https://developers.kakao.com/assets/img/about/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png",
           link: {
-            mobileWebUrl: "https://www.naver.com",
-            webUrl: "https://www.google.com",
+            mobileWebUrl: siteUrl,
+            webUrl: siteUrl,
           },
         },
         buttons: [
           {
             title: "자세히 보러 가기",
             link: {
-              mobileWebUrl: "https://www.naver.com",
-              webUrl: "https://www.google.com",
+              mobileWebUrl: siteUrl,
+              webUrl: siteUrl,
             },
           },
         ],
@@ -118,9 +127,9 @@ const DetailModal = ({ performance, onClose }) => {
           )}
         </ModalContentTop>
         <ModalContentBottom>
-          <span style={{display: "flex", justifyContent:"space-between"}}>
-          <h2 style={{ textAlign: "center" }}>{performance.prfnm}</h2>
-          <button onClick={shareKakao}>공유하기</button>
+          <span style={{ display: "flex", justifyContent: "space-between" }}>
+            <h2 style={{ textAlign: "center" }}>{performance.prfnm}</h2>
+            <button onClick={shareKakao}>공유하기</button>
           </span>
           <StyledHr />
 
