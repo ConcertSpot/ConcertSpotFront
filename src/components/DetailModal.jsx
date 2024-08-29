@@ -87,8 +87,8 @@ const DetailModal = ({ performance, onClose }) => {
       kakao.Link.sendDefault({
         objectType: "feed", 
         content: {
-          title: "제목입니다",
-          description: "설명란입니다",
+          title: "공연 정보는 역시 ConcertSpot!",
+          description: "당신에게 공연을 같이보자고 하네요??",
           imageUrl:
             "https://developers.kakao.com/assets/img/about/logos/kakaotalksharing/kakaotalk_sharing_btn_medium.png",
           link: {
