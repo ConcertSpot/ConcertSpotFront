@@ -82,6 +82,7 @@ const StyledButton = styled.button`
   font-size: 20px;
   background-color: white;
   border-left: 1px solid lightgray;
+    type: button; // 추가된 부분
 `;
 
 const Map = () => {

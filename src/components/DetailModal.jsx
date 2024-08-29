@@ -1,28 +1,28 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import styled from "styled-components";
 
 const ModalOverlay = styled.div`
   width: 100%;
   height: 100%;
-  position: absolute;
-  display: flex;
+  position: fixed;
   top: 0;
+  left: 0;
+  display: flex;
   background-color: rgba(0, 0, 0, 0.8);
   justify-content: center;
   align-items: center;
-  overflow-y: scroll;
   z-index: 1000;
 `;
 
 const ModalContent = styled.div`
   width: 90%;
-  height: 90dvh;
+  max-height: 90vh;
   display: flex;
   background-color: white;
   border-radius: 10px;
   flex-direction: column;
   align-items: center;
-  overflow-y: scroll;
+  overflow-y: auto;
 `;
 
 const ModalContentTop = styled.div`
@@ -37,25 +37,25 @@ const ModalContentBottom = styled.div`
   flex-direction: column;
   align-items: flex-start;
   justify-content: space-around;
-  padding: 10px;
-  span {
-    margin-top: 30px;
+  padding: 20px;
+  
+  & > span {
+    margin-top: 10px;
   }
 `;
 
 const StyledHr = styled.hr`
   width: 100%;
   border: 1px solid gray;
-  margin-top: 20px;
+  margin: 20px 0;
 `;
 
 const ButtonArea = styled.div`
   width: 100%;
-  height: 90px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-direction: row;
+  margin-top: 20px;
 `;
 
 const StyledButton = styled.button`
@@ -64,51 +64,114 @@ const StyledButton = styled.button`
   border: none;
   border-radius: 5px;
   background-color: lightsalmon;
-  margin-top: 10px;
   font-size: 15px;
   font-weight: bold;
   color: black;
+  cursor: pointer;
+`;
+
+const ShareButton = styled.button`
+  background-color: #FEE500;
+  color: #000000;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
 `;
 
 const DetailModal = ({ performance, onClose }) => {
-  if (!performance) return null;
+  const [isKakaoInitialized, setIsKakaoInitialized] = useState(false);
 
-  const handleClick = () => {
-    window.open(performance.relates[0].relate[0].relateurl[0], '_blank');
-  };
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://developers.kakao.com/sdk/js/kakao.js';
+    script.async = true;
+    script.onload = () => {
+      if (window.Kakao) {
+        if (!window.Kakao.isInitialized()) {
+          window.Kakao.init('ed218e43e083f32fc9b2e645cbee237d');
+        }
+        setIsKakaoInitialized(true);
+      }
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handleClick = useCallback(() => {
+    if (performance?.relates?.[0]?.relate?.[0]?.relateurl?.[0]) {
+      window.open(performance.relates[0].relate[0].relateurl[0], '_blank');
+    } else {
+      console.error('Invalid performance data structure for ticket URL');
+      alert('예매 링크를 찾을 수 없습니다.');
+    }
+  }, [performance]);
+
+  const handleShare = useCallback(() => {
+    if (!isKakaoInitialized) {
+      console.error('Kakao SDK is not initialized');
+      alert('카카오톡 공유 기능을 초기화하는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    if (!window.Kakao || !window.Kakao.Link) {
+      console.error('Kakao SDK is not available');
+      alert('카카오톡 공유 기능을 사용할 수 없습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    const shareUrl = performance?.relates?.[0]?.relate?.[0]?.relateurl?.[0] || window.location.href;
+
+    try {
+      window.Kakao.Link.sendDefault({
+        objectType: 'text',
+        text: '공연 정보를 확인해보세요!',
+        link: {
+          mobileWebUrl: shareUrl,
+          webUrl: shareUrl,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to share via Kakao:', error);
+      alert('카카오톡 공유에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
+  }, [isKakaoInitialized, performance]);
+
+  if (!performance) return null;
 
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <ModalContentTop>
           {performance.poster && (
-            <img src={performance.poster} style={{ width: "100%", height: "100%" }} alt="Performance Poster" />
+            <img src={performance.poster} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="Performance Poster" />
           )}
         </ModalContentTop>
         <ModalContentBottom>
-          <h2 style={{ textAlign: "center" }}>{performance.prfnm}</h2>
+          <div style={{width: "100%", display: "flex", flexDirection: "row", justifyContent:"space-between", alignItems: "center"}}>
+            <h2 style={{ textAlign: "center", margin: 0 }}>{performance.prfnm || '제목 없음'}</h2>
+            <ShareButton onClick={handleShare}>카카오톡 공유</ShareButton>
+          </div>
           <StyledHr />
 
-          <span style={{ color: "gray", fontWeight: "bold" }}>장르 </span>
-          <span style={{ marginTop: "0px" }}>{performance.genrenm}</span>
-
-          <span style={{ color: "gray", fontWeight: "bold" }}>장소 </span>
-          <span style={{ marginTop: "0px" }}>{performance.fcltynm}</span>
-
-          <span style={{ color: "gray", fontWeight: "bold" }}>예매가격 </span>
-          <span style={{ marginTop: "0px" }}>{performance.pcseguidance}</span>
-
-          <span style={{ color: "gray", fontWeight: "bold" }}>상영시간 </span>
-          <span style={{ marginTop: "0px" }}>{performance.dtguidance} {performance.prfruntime}</span>
-
-          <span style={{ color: "gray", fontWeight: "bold" }}>날짜 </span>
-          <span style={{ marginTop: "0px" }}>{performance.prfpdfrom} ~ {performance.prfpdto}</span>
-
-          <span style={{ color: "gray", fontWeight: "bold" }}>출현진 </span>
-          <span style={{ marginTop: "0px" }}>{performance.prfcast}</span>
-
-          <span style={{ color: "gray", fontWeight: "bold" }}>제작진 </span>
-          <span style={{ marginTop: "0px" }}>{performance.prfcrew}</span>
+          {[
+            { label: "장르", value: performance.genrenm },
+            { label: "장소", value: performance.fcltynm },
+            { label: "예매가격", value: performance.pcseguidance },
+            { label: "상영시간", value: `${performance.dtguidance || ''} ${performance.prfruntime || ''}` },
+            { label: "날짜", value: performance.prfpdfrom && performance.prfpdto ? `${performance.prfpdfrom} ~ ${performance.prfpdto}` : '날짜 정보 없음' },
+            { label: "출현진", value: performance.prfcast },
+            { label: "제작진", value: performance.prfcrew }
+          ].map(({ label, value }) => (
+            <React.Fragment key={label}>
+              <span style={{ color: "gray", fontWeight: "bold" }}>{label}</span>
+              <span>{value || '정보 없음'}</span>
+            </React.Fragment>
+          ))}
 
           <ButtonArea>
             <StyledButton onClick={onClose}>닫기</StyledButton>
