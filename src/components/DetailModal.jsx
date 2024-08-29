@@ -95,7 +95,7 @@ const DetailModal = ({ performance, onClose }) => {
         objectType: "feed",
         content: {
           title: "공연정보는 역시 콘서트스팟!",
-          text: "???",
+          description: `'${performance.prfnm}' 공연 예매 링크: ${ticketUrl}\n\n친구가 같이 보자고 하는 공연이군요! 콘서트스팟에서 더 많은 공연을 확인해보세요.`,
           description: `'${performance.prfnm}' 공연 예매 링크: ${ticketUrl}\n\n친구가 같이 보자고 하는 공연이군요! 콘서트스팟에서 더 많은 공연을 확인해보세요.`,
           imageUrl: `${performance.poster}`,
           link: {
@@ -105,7 +105,7 @@ const DetailModal = ({ performance, onClose }) => {
         },
         buttons: [
           {
-            title: "자세히 보기",
+            title: "내 주변 공연정보 탐색",
             link: {
               mobileWebUrl: sharedUrl,
               webUrl: sharedUrl,
