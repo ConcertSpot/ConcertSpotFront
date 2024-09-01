@@ -86,7 +86,7 @@ const News = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/news"); // Express 서버 엔드포인트로 변경
+        const response = await axios.get("https://web-concertspotfront-lxw4rw2ief7129ee.sel5.cloudtype.app/api/news"); // Express 서버 엔드포인트로 변경
         console.log(response.data.articles);
         setArticles(response.data.articles);
       } catch (error) {
