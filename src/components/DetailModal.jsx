@@ -84,7 +84,7 @@ const LinkBtn = styled.button`
   background-color: lightgray;
   font-size: 30px;
   cursor: pointer;
-    color: black;
+  color: black;
 `;
 
 const KakaoBtn = styled.button`
@@ -119,10 +119,11 @@ const DetailModal = ({ place, performance, onClose }) => {
         kakao.init("ed218e43e083f32fc9b2e645cbee237d");
       }
 
-      const sharedUrl = "https://web-concertspotfront-lxw4rw2ie`f`7129ee.sel5.cloudtype.app/"; // 콘서트스팟 메인 페이지 URL
+      const sharedUrl = "https://web-concertspotfront-lxw4rw2ief7129ee.sel5.cloudtype.app/"; // 콘서트스팟 메인 페이지 URL
       const ticketUrl = performance.relates[0].relate[0].relateurl[0];
 
-      kakao.Link.sendDefault({
+      kakao.Share.createDefaultButton({
+        container: '#kakao-share-button',
         objectType: "location",
         address: `${performance.fcltynm}`,
         addressTitle: "공연장 위치",
@@ -175,7 +176,7 @@ const DetailModal = ({ place, performance, onClose }) => {
           
           <div style={{width:"100%", height:"5%", display:"flex", justifyContent:"flex-end", marginTop:"20px"}}>
             <LinkBtn onClick={copyToClipboard}><LuLink /></LinkBtn>
-            <KakaoBtn onClick={shareKakao}><RiKakaoTalkFill /></KakaoBtn>
+            <KakaoBtn id="kakao-share-button" onClick={shareKakao}><RiKakaoTalkFill /></KakaoBtn>
           </div>
           <span style={{ color: "gray", fontWeight: "bold" }}>장르 </span>
           <span style={{ marginTop: "0px" }}>{performance.genrenm}</span>
