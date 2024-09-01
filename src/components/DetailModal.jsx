@@ -84,6 +84,7 @@ const LinkBtn = styled.button`
   background-color: lightgray;
   font-size: 30px;
   cursor: pointer;
+    color: black;
 `;
 
 const KakaoBtn = styled.button`
@@ -97,6 +98,7 @@ const KakaoBtn = styled.button`
   background-color: #FEE500;
   font-size: 30px;
   cursor: pointer;
+  color: black;
 `;
 
 const DetailModal = ({ place, performance, onClose }) => {

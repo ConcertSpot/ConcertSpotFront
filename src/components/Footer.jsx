@@ -51,10 +51,10 @@ const Footer = () => {
 
   return ( 
     <Container>
-      <IconFrame to="/"><IoHome /></IconFrame>
+      <IconFrame to="/Home"><IoHome /></IconFrame>
       <IconFrame to="/Map"><FaSearchLocation /></IconFrame>
       <IconFrame to="/List"><CgMenuGridR /></IconFrame>
-      <IconFrame to="/test"><FaUserLock /></IconFrame>
+      <IconFrame to="/News"><FaUserLock /></IconFrame>
     </Container>
   )
 }

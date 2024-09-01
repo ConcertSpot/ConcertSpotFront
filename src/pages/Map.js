@@ -41,7 +41,7 @@ const TopFrame = styled.div`
 
 const SearchArea = styled.div`
   @media (max-width: 768px) {
-    height: 5dvh;
+    height: 8dvh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,9 +79,9 @@ const StyledButton = styled.button`
   height: 100%;
   border: none;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 25px;
   background-color: white;
-  border-left: 1px solid lightgray;
+  border: none;
   type: button; // 추가된 부분
 `;
 

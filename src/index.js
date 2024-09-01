@@ -7,6 +7,7 @@ import App from './pages/App';
 import Home from './pages/Home';
 import Map from './pages/Map';
 import List from './pages/List';
+import News from './pages/News';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -17,6 +18,7 @@ root.render(
         <Route path="/Home" element={<Home/>} />
         <Route path="/Map" element={<Map />} />
         <Route path="/List" element={<List />} />
+        <Route path="/News" element={<News />} />
       </Routes>
     </React.StrictMode>
   </BrowserRouter>
