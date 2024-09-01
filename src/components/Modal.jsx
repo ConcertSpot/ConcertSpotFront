@@ -10,7 +10,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   position: absolute;
-  border: 1px solid black;
+  border: none;
 
   @media (max-width: 768px) {
     width: 80%;

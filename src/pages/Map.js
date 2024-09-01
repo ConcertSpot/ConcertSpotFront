@@ -82,7 +82,7 @@ const StyledButton = styled.button`
   font-size: 20px;
   background-color: white;
   border-left: 1px solid lightgray;
-    type: button; // 추가된 부분
+  type: button; // 추가된 부분
 `;
 
 const Map = () => {
@@ -163,7 +163,7 @@ const Map = () => {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=ed218e43e083f32fc9b2e645cbee237d&libraries=services&autoload=false";
+    script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=ed218e43e083f32fc9b2e645cbee237d&libraries=services,clusterer,drawing&autoload=false";
     document.head.appendChild(script);
 
     script.onload = () => {
@@ -177,7 +177,6 @@ const Map = () => {
         };
         const map = new window.kakao.maps.Map(container, options);
         
-
         // 빨간색 마커 이미지 생성
         const markerImage = new window.kakao.maps.MarkerImage(
           'https://cdn.pixabay.com/photo/2014/04/03/10/03/google-309740_960_720.png',
@@ -201,8 +200,12 @@ const Map = () => {
         // 주소 검색 기능 추가
         const geocoder = new window.kakao.maps.services.Geocoder();
 
+        // 새로운 장소 검색 API 인스턴스 생성
+        const places = new window.kakao.maps.services.Places();
+
         const searchAddress = () => {
-          geocoder.addressSearch(address, (result, status) => {
+          // 주소 검색이 아니라 키워드 검색으로 변경
+          places.keywordSearch(address, (result, status) => {
             if (status === window.kakao.maps.services.Status.OK) {
               const newCoords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
               map.setCenter(newCoords);
@@ -211,10 +214,10 @@ const Map = () => {
               setLongitude(result[0].x);
               localStorage.setItem('latitude', result[0].y);
               localStorage.setItem('longitude', result[0].x);
-              setAddressResult(result[0].address_name);
+              setAddressResult(result[0].address_name || result[0].road_address_name);
 
               // 주소를 기반으로 데이터 검색
-              fetchData(result[0].address_name, map);
+              fetchData(result[0].address_name || result[0].road_address_name, map);
             } else {
               console.error("Failed to search address:", status);
             }

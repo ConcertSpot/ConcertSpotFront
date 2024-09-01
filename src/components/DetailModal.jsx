@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
+import { RiKakaoTalkFill } from "react-icons/ri";
+import { LuLink } from "react-icons/lu";
 
 const ModalOverlay = styled.div`
   width: 100%;
@@ -68,12 +70,39 @@ const StyledButton = styled.button`
   font-size: 15px;
   font-weight: bold;
   color: black;
+  cursor: pointer;
 `;
 
-const DetailModal = ({ performance, onClose }) => {
+const LinkBtn = styled.button`
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 100%;
+  background-color: lightgray;
+  font-size: 30px;
+  cursor: pointer;
+`;
+
+const KakaoBtn = styled.button`
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 100%;
+  background-color: #FEE500;
+  font-size: 30px;
+  cursor: pointer;
+`;
+
+const DetailModal = ({ place, performance, onClose }) => {
   useEffect(() => {
-    console.log(performance.relates[0].relate[0].relateurl[0]);
-  }, [performance])
+    console.log(place);
+  }, [performance]);
 
   if (!performance) return null;
 
@@ -88,7 +117,7 @@ const DetailModal = ({ performance, onClose }) => {
         kakao.init("ed218e43e083f32fc9b2e645cbee237d");
       }
 
-      const sharedUrl = "https://web-concertspotfront-lxw4rw2ief7129ee.sel5.cloudtype.app/"; // 콘서트스팟 메인 페이지 URL
+      const sharedUrl = "https://web-concertspotfront-lxw4rw2ie`f`7129ee.sel5.cloudtype.app/"; // 콘서트스팟 메인 페이지 URL
       const ticketUrl = performance.relates[0].relate[0].relateurl[0];
 
       kakao.Link.sendDefault({
@@ -106,7 +135,7 @@ const DetailModal = ({ performance, onClose }) => {
         },
         buttons: [
           {
-            title: "콘서트스팟 바로가기",
+            title: `콘서트스팟 \n 바로가기`,
             link: {
               mobileWebUrl: sharedUrl,
               webUrl: sharedUrl,
@@ -115,6 +144,17 @@ const DetailModal = ({ performance, onClose }) => {
         ],
       });
     }
+  };
+
+  const copyToClipboard = () => {
+    const url = performance.relates[0].relate[0].relateurl[0];
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        alert('URL이 클립보드에 복사되었습니다!');
+      })
+      .catch(err => {
+        console.error('클립보드에 복사하는 중 오류가 발생했습니다: ', err);
+      });
   };
 
   return (
@@ -128,10 +168,13 @@ const DetailModal = ({ performance, onClose }) => {
         <ModalContentBottom>
           <span style={{display: "flex", justifyContent:"space-between"}}>
             <h2 style={{ textAlign: "center" }}>{performance.prfnm}</h2>
-            <button onClick={shareKakao}>공유하기</button>
           </span>
           <StyledHr />
-
+          
+          <div style={{width:"100%", height:"5%", display:"flex", justifyContent:"flex-end", marginTop:"20px"}}>
+            <LinkBtn onClick={copyToClipboard}><LuLink /></LinkBtn>
+            <KakaoBtn onClick={shareKakao}><RiKakaoTalkFill /></KakaoBtn>
+          </div>
           <span style={{ color: "gray", fontWeight: "bold" }}>장르 </span>
           <span style={{ marginTop: "0px" }}>{performance.genrenm}</span>
 
