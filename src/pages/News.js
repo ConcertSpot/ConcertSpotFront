@@ -81,28 +81,18 @@ const NewsItem = styled.div`
 
 const News = () => {
   const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true); // 로딩 상태 추가
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
-          "https://newsapi.org/v2/everything",
-          {
-            params: {
-              q: "공연 OR 콘서트 OR 뮤지컬",
-              language: "ko",
-              sortBy: "publishedAt",
-              apiKey: "49311f06c6254f7f96cb4fb2d9c64431",
-            },
-          }
-        );
+        const response = await axios.get("http://localhost:8000/api/news"); // Express 서버 엔드포인트로 변경
         console.log(response.data.articles);
         setArticles(response.data.articles);
       } catch (error) {
         console.error("Error fetching news:", error);
       } finally {
-        setLoading(false); // 데이터 로딩 완료 후 로딩 상태 해제
+        setLoading(false);
       }
     };
 
@@ -115,8 +105,8 @@ const News = () => {
         <h1>📰 Concert Feed</h1>
       </HeaderFrame>
       {loading ? (
-        <div style={{height:"80dvh"}}>
-          <Loading /> // 로딩 중일 때 로딩 컴포넌트 표시
+        <div style={{ height: "80dvh" }}>
+          <Loading />
         </div>
       ) : (
         <ArticleFrame>
