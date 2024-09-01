@@ -86,7 +86,7 @@ const News = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://web-concertspotfront-lxw4rw2ief7129ee.sel5.cloudtype.app/api/news");
+        const response = await axios.get("https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/api/news");
         console.log(response.data); // 전체 응답 구조를 확인합니다
         setArticles(response.data.articles || []); // articles가 없으면 빈 배열로 설정합니다
       } catch (error) {
