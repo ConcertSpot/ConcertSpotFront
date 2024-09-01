@@ -86,11 +86,12 @@ const News = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("https://web-concertspotfront-lxw4rw2ief7129ee.sel5.cloudtype.app/api/news"); // Express 서버 엔드포인트로 변경
-        console.log(response.data.articles);
-        setArticles(response.data.articles);
+        const response = await axios.get("https://web-concertspotfront-lxw4rw2ief7129ee.sel5.cloudtype.app/api/news");
+        console.log(response.data); // 전체 응답 구조를 확인합니다
+        setArticles(response.data.articles || []); // articles가 없으면 빈 배열로 설정합니다
       } catch (error) {
         console.error("Error fetching news:", error);
+        setArticles([]); // 오류 발생 시 빈 배열로 설정합니다
       } finally {
         setLoading(false);
       }
@@ -110,18 +111,22 @@ const News = () => {
         </div>
       ) : (
         <ArticleFrame>
-          {articles.map((article, index) => (
-            <NewsItem key={index}>
-              {article.urlToImage && <img src={article.urlToImage} alt={article.title} />}
-              <h2>{article.title}</h2>
-              <p>{article.description}</p>
-              <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
-                <a href={article.url} target="_blank" rel="noopener noreferrer">
-                  자세히 보기
-                </a>
-              </div>
-            </NewsItem>
-          ))}
+          {articles.length > 0 ? (
+            articles.map((article, index) => (
+              <NewsItem key={index}>
+                {article.urlToImage && <img src={article.urlToImage} alt={article.title} />}
+                <h2>{article.title}</h2>
+                <p>{article.description}</p>
+                <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
+                  <a href={article.url} target="_blank" rel="noopener noreferrer">
+                    자세히 보기
+                  </a>
+                </div>
+              </NewsItem>
+            ))
+          ) : (
+            <p>뉴스가 없습니다.</p> // 기사 데이터가 없는 경우 처리
+          )}
         </ArticleFrame>
       )}
       <Footer />
