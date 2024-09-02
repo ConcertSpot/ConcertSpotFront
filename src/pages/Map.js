@@ -82,7 +82,6 @@ const StyledButton = styled.button`
   font-size: 25px;
   background-color: white;
   border: none;
-  type: button; // 추가된 부분
 `;
 
 const Map = () => {
@@ -109,19 +108,14 @@ const Map = () => {
       });
       marker.setMap(map);
     
-      // 마커 클릭 이벤트
       window.kakao.maps.event.addListener(marker, 'click', function() {
         console.log("Marker clicked:", performance.detail.dbs.db[0]);
-  
-        // 선택된 마커 위치로 지도 이동
         map.panTo(markerPosition);
-  
-        setSelectedPerformance(performance.detail.dbs.db[0]);  // 선택된 공연 설정
-        setModalState(true);  // 모달 열기
+        setSelectedPerformance(performance.detail.dbs.db[0]);
+        setModalState(true);
       });
     });
   }, []);
-  
 
   const fetchData = useCallback(async (address, map) => {
     try {
@@ -161,6 +155,35 @@ const Map = () => {
     }
   }, [createPerformanceMarkers]);
 
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
+    if (isKakaoLoaded) {
+      const places = new window.kakao.maps.services.Places();
+      places.keywordSearch(address, (result, status) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          const newCoords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+          const map = new window.kakao.maps.Map(document.getElementById("map"), {
+            center: newCoords,
+            level: 3,
+          });
+          const marker = new window.kakao.maps.Marker({
+            position: newCoords,
+          });
+          marker.setMap(map);
+          setLatitude(result[0].y);
+          setLongitude(result[0].x);
+          localStorage.setItem('latitude', result[0].y);
+          localStorage.setItem('longitude', result[0].x);
+          setAddressResult(result[0].address_name || result[0].road_address_name);
+
+          fetchData(result[0].address_name || result[0].road_address_name, map);
+        } else {
+          console.error("Failed to search address:", status);
+        }
+      });
+    }
+  }, [address, isKakaoLoaded, fetchData]);
+
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://dapi.kakao.com/v2/maps/sdk.js?appkey=ed218e43e083f32fc9b2e645cbee237d&libraries=services,clusterer,drawing&autoload=false";
@@ -173,60 +196,28 @@ const Map = () => {
         const options = {
           center: new window.kakao.maps.LatLng(latitude, longitude),
           level: 3,
-          draggable: true, // 드래그 기능 활성화
+          draggable: true,
         };
         const map = new window.kakao.maps.Map(container, options);
         
-        // 빨간색 마커 이미지 생성
         const markerImage = new window.kakao.maps.MarkerImage(
           'https://cdn.pixabay.com/photo/2014/04/03/10/03/google-309740_960_720.png',
           new window.kakao.maps.Size(28, 45),
           { offset: new window.kakao.maps.Point(13, 35) }
         );
 
-        // 마커를 생성하고 설정합니다.
         const markerPosition = new window.kakao.maps.LatLng(latitude, longitude);
         const marker = new window.kakao.maps.Marker({
           position: markerPosition,
-          image: markerImage // 빨간색 마커 이미지 적용
+          image: markerImage
         });
 
-        // 마커를 지도에 추가합니다.
         marker.setMap(map);
 
-        // 3D 지도 타입 설정
         map.setMapTypeId(window.kakao.maps.MapTypeId.NORMAL);
 
-        // 주소 검색 기능 추가
         const geocoder = new window.kakao.maps.services.Geocoder();
 
-        // 새로운 장소 검색 API 인스턴스 생성
-        const places = new window.kakao.maps.services.Places();
-
-        const searchAddress = () => {
-          // 주소 검색이 아니라 키워드 검색으로 변경
-          places.keywordSearch(address, (result, status) => {
-            if (status === window.kakao.maps.services.Status.OK) {
-              const newCoords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
-              map.setCenter(newCoords);
-              marker.setPosition(newCoords);
-              setLatitude(result[0].y);
-              setLongitude(result[0].x);
-              localStorage.setItem('latitude', result[0].y);
-              localStorage.setItem('longitude', result[0].x);
-              setAddressResult(result[0].address_name || result[0].road_address_name);
-
-              // 주소를 기반으로 데이터 검색
-              fetchData(result[0].address_name || result[0].road_address_name, map);
-            } else {
-              console.error("Failed to search address:", status);
-            }
-          });
-        };
-
-        document.getElementById("search-btn").onclick = searchAddress;
-
-        // 페이지 로드 시 위도와 경도로 주소 변환
         const coord = new window.kakao.maps.LatLng(latitude, longitude);
         geocoder.coord2Address(coord.getLng(), coord.getLat(), (result, status) => {
           if (status === window.kakao.maps.services.Status.OK) {
@@ -248,7 +239,7 @@ const Map = () => {
         document.head.removeChild(script);
       }
     };
-  }, [latitude, longitude, address, fetchData]);
+  }, [latitude, longitude, fetchData]);
 
   const closeModal = useCallback(() => {
     setModalState(false);
@@ -260,15 +251,17 @@ const Map = () => {
 
   return (
     <Container>
-      <SearchArea>
-        <StyledInput 
-          type="text" 
-          value={address} 
-          onChange={(e) => setAddress(e.target.value)} 
-          placeholder="다른 지역 검색" 
-        />
-        <StyledButton id="search-btn"><FaSearchLocation /></StyledButton>
-      </SearchArea>
+      <form onSubmit={handleSubmit}>
+        <SearchArea>
+          <StyledInput 
+            type="text" 
+            value={address} 
+            onChange={(e) => setAddress(e.target.value)} 
+            placeholder="다른 지역 검색" 
+          />
+          <StyledButton type="submit"><FaSearchLocation /></StyledButton>
+        </SearchArea>
+      </form>
       <TopFrame>
         <div id="map" style={{ width: "100%", height: "100%", zIndex: 100 }}></div>
       </TopFrame>
