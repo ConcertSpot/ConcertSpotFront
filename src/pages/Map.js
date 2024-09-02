@@ -25,7 +25,7 @@ const TopFrame = styled.div`
   border: 1px solid black;
 
   @media (max-width: 768px) {
-    height: 85dvh;
+    height: 82dvh;
     border: none;
     display: flex;
     align-items: center;
@@ -82,6 +82,7 @@ const StyledButton = styled.button`
   font-size: 25px;
   background-color: white;
   border: none;
+  color: black;
 `;
 
 const Map = () => {
