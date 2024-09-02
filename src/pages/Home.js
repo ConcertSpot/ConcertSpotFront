@@ -105,7 +105,14 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    // 페이지 로드 시 한 번만 새로고침
+    const hasRefreshed = sessionStorage.getItem('hasRefreshed');
+    if (!hasRefreshed) {
+      sessionStorage.setItem('hasRefreshed', 'true');
+      window.location.reload();
+    } else {
+      fetchData();
+    }
     
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
