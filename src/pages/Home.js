@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import styled, { keyframes } from "styled-components";
 import axios from "axios";
 import Footer from "../components/Footer";
@@ -6,7 +6,6 @@ import Modal from "../components/Modal";
 import RowConcertBox from "../components/RowConcertBox";
 
 // 애니메이션 효과 영역
-
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -24,9 +23,8 @@ const textUp = keyframes`
     transform: translateY(-35dvh);
   }
 `;
-   
+
 // styled-component 영역
-  
 const Container = styled.div`
   width: 100%;
   height: 100%;
@@ -72,58 +70,66 @@ const TopFrame = styled.div`
 `;
 
 // 본문
-
 const Home = () => {
   const [concertList, setConcertList] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [key, setKey] = useState(0);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await axios.get("https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/performances");
+      setConcertList(response.data.dbs.db);
+      console.log(response.data.dbs.db);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get("https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/performances");
-        // "https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/performances"
-        setConcertList(response.data.dbs.db);
-        console.log(response.data.dbs.db);
-      } catch (error) {
-        console.log(error);
-      }
-    };
     fetchData();
-  }, []);
-  
+  }, [fetchData]);
+
   useEffect(() => {
     if (concertList.length > 0) {
       const interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % concertList.length);
+        setKey(prevKey => prevKey + 1);
       }, 3000);
-  
+
       return () => clearInterval(interval);
     }
   }, [concertList]);
-  
+
   const handleImageLoad = () => {
     console.log("Image loaded");
   };
 
+  const handleImageError = () => {
+    console.log("Image failed to load");
+    // 이미지 로드 실패 시 다시 시도
+    setKey(prevKey => prevKey + 1);
+  };
+
   return (
     <Container>
-    <TopFrame>
-      <h1>
-        이번달 전국 각지의 <br /> 이런 공연은 어떨까요?
-      </h1>
-      {concertList.length > 0 && (
-        <RowConcertBox
-          key={currentIndex}
-          posterImg={concertList[currentIndex].poster}
-          title={concertList[currentIndex].prfnm}
-          place={concertList[currentIndex].fcltynm}
-          start={concertList[currentIndex].prfpdfrom}
-          end={concertList[currentIndex].prfpdto}
-          state={concertList[currentIndex].prfstate}
-          onLoad={handleImageLoad} // 이미지 로드 이벤트 추가
-        />
-      )}
-    </TopFrame>
+      <TopFrame>
+        <h1>
+          이번달 전국 각지의 <br /> 이런 공연은 어떨까요?
+        </h1>
+        {concertList.length > 0 && (
+          <RowConcertBox
+            key={`${currentIndex}-${key}`}
+            posterImg={concertList[currentIndex].poster}
+            title={concertList[currentIndex].prfnm}
+            place={concertList[currentIndex].fcltynm}
+            start={concertList[currentIndex].prfpdfrom}
+            end={concertList[currentIndex].prfpdto}
+            state={concertList[currentIndex].prfstate}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
+          />
+        )}
+      </TopFrame>
       <Footer />
     </Container>
   );
