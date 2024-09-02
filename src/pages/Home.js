@@ -98,7 +98,7 @@ const Home = () => {
       setConcertList(response.data.dbs.db);
       console.log(response.data.dbs.db);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -119,29 +119,37 @@ const Home = () => {
 
   useEffect(() => {
     if (concertList.length > 0) {
+      // 이미지 프리로딩
+      concertList.forEach((concert) => {
+        const img = new Image();
+        img.src = concert.poster;
+      });
+
       const interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % concertList.length);
         setKey(prevKey => prevKey + 1);
-      }, 4500);  // 3초에서 7초로 변경
+      }, 4500);
 
       return () => clearInterval(interval);
     }
   }, [concertList]);
 
   const handleImageLoad = () => {
-    console.log("Image loaded");
+    console.log("Image loaded successfully");
     setIsLoading(false);
   };
 
-  const handleImageError = () => {
-    console.log("Image failed to load");
+  const handleImageError = (e) => {
+    console.error("Image failed to load:", e);
     setIsLoading(false);
     setKey(prevKey => prevKey + 1);
   };
 
-  const getImageUrlWithTimestamp = (url) => {
-    return `${url}?t=${new Date().getTime()}`;
-  };
+  const getImageUrlWithTimestamp = useCallback((url) => {
+    const timestamp = new Date().getTime();
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}t=${timestamp}`;
+  }, []);
 
   return (
     <Container>
@@ -155,7 +163,7 @@ const Home = () => {
           concertList.length > 0 && (
             <RowConcertBox
               key={`${currentIndex}-${key}`}
-              posterImg={isMobile ? getImageUrlWithTimestamp(concertList[currentIndex].poster) : concertList[currentIndex].poster}
+              posterImg={getImageUrlWithTimestamp(concertList[currentIndex].poster)}
               title={concertList[currentIndex].prfnm}
               place={concertList[currentIndex].fcltynm}
               start={concertList[currentIndex].prfpdfrom}
