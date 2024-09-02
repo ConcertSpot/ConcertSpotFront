@@ -69,24 +69,52 @@ const TopFrame = styled.div`
   }
 `;
 
+const LoadingSpinner = styled.div`
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
 // 본문
 const Home = () => {
   const [concertList, setConcertList] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [key, setKey] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get("https://port-0-concertspotback-lxw4rw2ief7129ee.sel5.cloudtype.app/performances");
       setConcertList(response.data.dbs.db);
       console.log(response.data.dbs.db);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchData();
+    
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
   }, [fetchData]);
 
   useEffect(() => {
@@ -94,7 +122,7 @@ const Home = () => {
       const interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % concertList.length);
         setKey(prevKey => prevKey + 1);
-      }, 3000);
+      }, 4500);  // 3초에서 7초로 변경
 
       return () => clearInterval(interval);
     }
@@ -102,12 +130,17 @@ const Home = () => {
 
   const handleImageLoad = () => {
     console.log("Image loaded");
+    setIsLoading(false);
   };
 
   const handleImageError = () => {
     console.log("Image failed to load");
-    // 이미지 로드 실패 시 다시 시도
+    setIsLoading(false);
     setKey(prevKey => prevKey + 1);
+  };
+
+  const getImageUrlWithTimestamp = (url) => {
+    return `${url}?t=${new Date().getTime()}`;
   };
 
   return (
@@ -116,18 +149,22 @@ const Home = () => {
         <h1>
           이번달 전국 각지의 <br /> 이런 공연은 어떨까요?
         </h1>
-        {concertList.length > 0 && (
-          <RowConcertBox
-            key={`${currentIndex}-${key}`}
-            posterImg={concertList[currentIndex].poster}
-            title={concertList[currentIndex].prfnm}
-            place={concertList[currentIndex].fcltynm}
-            start={concertList[currentIndex].prfpdfrom}
-            end={concertList[currentIndex].prfpdto}
-            state={concertList[currentIndex].prfstate}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-          />
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          concertList.length > 0 && (
+            <RowConcertBox
+              key={`${currentIndex}-${key}`}
+              posterImg={isMobile ? getImageUrlWithTimestamp(concertList[currentIndex].poster) : concertList[currentIndex].poster}
+              title={concertList[currentIndex].prfnm}
+              place={concertList[currentIndex].fcltynm}
+              start={concertList[currentIndex].prfpdfrom}
+              end={concertList[currentIndex].prfpdto}
+              state={concertList[currentIndex].prfstate}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+            />
+          )
         )}
       </TopFrame>
       <Footer />
